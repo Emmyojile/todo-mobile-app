@@ -12,6 +12,8 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+const jwt = require("jsonwebtoken");
+
 mongoose
   .connect(
     "mongodb+srv://emmyojile:emmy%401599@cluster0.baodx4z.mongodb.net/todo-app?retryWrites=true&w=majority"
@@ -41,7 +43,7 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    const newUser = await User({
+    const newUser = new User({
       name,
       email,
       password,
@@ -50,6 +52,35 @@ app.post("/register", async (req, res) => {
     await newUser.save();
 
     res.status(202).json({ message: "User registered successfully" });
+  } catch (error) {
+    console.log("Error: " + error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+const generateSecretKey = () => {
+  const secretKey = crypto.randomBytes(32).toString("hex");
+  return secretKey;
+};
+const secretKey = generateSecretKey();
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      console.log("Email not found");
+      return res.status(400).json({ message: "Email not found" });
+    }
+
+    if (user.password !== password) {
+      return res.status(400).json({ message: "invalid Password" });
+    }
+
+    const token = jwt.sign({ userId: user._id }, secretKey);
+
+    res.status(200).json(token);
   } catch (error) {
     console.log("Error: " + error);
     res.status(500).json({ message: "Internal server error" });

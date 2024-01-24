@@ -20,7 +20,7 @@ const login = () => {
     <SafeAreaView style={styles.loginContianer}>
       <View style={{ marginTop: 80 }}>
         <Text style={{ fontSize: 18, fontWeight: "600", color: "#0066b2" }}>
-          TODO_LIST TRACKER
+          TODO-LIST TRACKER
         </Text>
       </View>
       <KeyboardAvoidingView>

@@ -10,9 +10,11 @@ import {
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 const register = () => {
+  const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const router = useRouter();
@@ -20,16 +22,30 @@ const register = () => {
     <SafeAreaView style={styles.loginContianer}>
       <View style={{ marginTop: 80 }}>
         <Text style={{ fontSize: 18, fontWeight: "600", color: "#0066b2" }}>
-          TODO_LIST TRACKER
+          TODO-LIST TRACKER
         </Text>
       </View>
       <KeyboardAvoidingView>
         <View style={{ alignItems: "center" }}>
           <Text style={{ fontSize: 16, fontWeight: "600", marginTop: 20 }}>
-            Login in to your Account
+            Register your Account
           </Text>
         </View>
         <View style={{ marginTop: 70 }}>
+          <View style={styles.inputContainer}>
+            <Ionicons name="person" size={24} color="gray" />
+            <TextInput
+              value={name}
+              onChangeText={(text) => setName(text)}
+              style={{
+                color: "gray",
+                marginVertical: 10,
+                width: 300,
+                fontSize: email ? 17 : 17,
+              }}
+              placeholder="enter your name"
+            />
+          </View>
           <View style={styles.inputContainer}>
             <MaterialIcons name="email" size={24} color="black" />
             <TextInput
