@@ -6,18 +6,38 @@ import {
   KeyboardAvoidingView,
   TextInput,
   Pressable,
+  Alert,
 } from "react-native";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import axios from "axios";
 
 const register = () => {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const router = useRouter();
+const handleRegister = () => {
+    const user = { 
+        name:name,
+        email:email,
+        password:password
+    }
+
+    axios.post("http://localhost:5000/register",user).then((response) => {
+        console.log(response);
+        Alert.alert("Registration successfull","You have been registered succesfully");
+        setEmail("");
+        setPassword("");
+        setName("");
+    }).catch((error) => {
+        Alert.alert("Registration failed","an error ocurred during registration");
+        console.log("error",error)
+    })
+}
   return (
     <SafeAreaView style={styles.loginContianer}>
       <View style={{ marginTop: 80 }}>
