@@ -98,7 +98,9 @@ const handleRegister = () => {
 
           <View style={{ marginTop: 60 }} />
 
-          <Pressable style={styles.loginBtnContainer}>
+          <Pressable style={styles.loginBtnContainer}
+          onPress={handleRegister}
+          >
             <Text style={styles.loginBtn}>Register</Text>
           </Pressable>
 

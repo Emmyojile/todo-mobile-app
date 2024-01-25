@@ -7,15 +7,42 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const login = () => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const router = useRouter();
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (token) {
+          router.replace("/(tabs)/home");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    checkLoginStatus();
+  }, []);
+  const handleLogin = () => {
+    const user = {
+      email: email,
+      password: password,
+    };
+
+    axios.post("http://localhost:5000/login", user).then((response) => {
+      const token = response.data.token;
+      AsyncStorage.setItem("authToken", token);
+      router.replace("/(tabs)/home");
+    });
+  };
   return (
     <SafeAreaView style={styles.loginContianer}>
       <View style={{ marginTop: 80 }}>
@@ -76,12 +103,14 @@ const login = () => {
 
           <View style={{ marginTop: 60 }} />
 
-          <Pressable style={styles.loginBtnContainer}>
-            <Text style={styles.loginBtn} >Login</Text>
+          <Pressable style={styles.loginBtnContainer}
+          onPress={handleLogin}
+          >
+            <Text style={styles.loginBtn}>Login</Text>
           </Pressable>
 
           <Pressable
-          onPress={() => router.replace("/register")}
+            onPress={() => router.replace("/register")}
             style={{ marginTop: 15 }}
           >
             <Text style={{ textAlign: "center", fontSize: 15, color: "gray" }}>
