@@ -4,13 +4,33 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
-import React from "react";
-import { AntDesign } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
+import {
+  BottomModal,
+  ModalContent,
+  ModalTitle,
+  SlideAnimation,
+} from "react-native-modals";
 
 const index = () => {
   const todos = [];
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [todo, setTodo] = useState("");
+
+  const suggestions = [
+    { id: 0, todo: "Buy groceries" },
+    { id: 1, todo: "Finish work report" },
+    { id: 2, todo: "Go for a run" },
+    { id: 3, todo: "Read a book" },
+    { id: 4, todo: "Call a friend" },
+    { id: 5, todo: "Attend a meeting" },
+    { id: 6, todo: "Go For Training" },
+  ];
+
   return (
     <>
       <View style={styles.topContainer}>
@@ -24,7 +44,12 @@ const index = () => {
           <Text style={{ color: "white", textAlign: "center" }}>Personal</Text>
         </Pressable>
         <Pressable style={{ marginLeft: "auto" }}>
-          <AntDesign name="pluscircle" size={30} color="#007fff" />
+          <AntDesign
+            onPress={() => setIsModalVisible(!isModalVisible)}
+            name="pluscircle"
+            size={30}
+            color="#007fff"
+          />
         </Pressable>
       </View>
 
@@ -51,12 +76,66 @@ const index = () => {
                 No Tasks for Today! add a task
               </Text>
               <Pressable style={{ marginTop: 15 }}>
-                <AntDesign name="pluscircle" size={30} color="#007fff" />
+                <AntDesign
+                  onPress={() => setIsModalVisible(!isModalVisible)}
+                  name="pluscircle"
+                  size={30}
+                  color="#007fff"
+                />
               </Pressable>
             </View>
           )}
         </View>
       </ScrollView>
+      <BottomModal
+        onBackDropPress={() => setIsModalVisible(!isModalVisible)}
+        onHardwareBackPress={() => setIsModalVisible(!isModalVisible)}
+        swipeDirection={["down", "up"]}
+        swipeThreshold={200}
+        modalTitle={<ModalTitle title="Add a Todo" />}
+        modalAnimation={
+          new SlideAnimation({
+            slideFrom: "bottom",
+          })
+        }
+        visible={isModalVisible}
+        onTouchOutside={() => setIsModalVisible(!isModalVisible)}
+      >
+        <ModalContent style={{ width: "100%", height: 200 }}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              value={todo}
+              onChangeText={(text) => setTodo(text)}
+              placeholder="Input a new todo"
+              style={styles.input}
+            />
+            <Ionicons name="send" size={24} color="#007FFF" />
+          </View>
+
+          <Text>Choose a category</Text>
+
+          <View style={styles.catContainer}>
+            <Pressable style={styles.cat}>
+              <Text>Work</Text>
+            </Pressable>
+            <Pressable style={styles.cat}>
+              <Text>Personal</Text>
+            </Pressable>
+            <Pressable style={styles.cat}>
+              <Text>WishList</Text>
+            </Pressable>
+          </View>
+
+          <Text>Some Suggestions</Text>
+          <View style={styles.suggestionContainer}>
+            {suggestions?.map((item, index) => (
+              <Pressable key={item.id} style={styles.suggestion}>
+                <Text style={{textAlign:"center"}}>{item.todo}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </ModalContent>
+      </BottomModal>
     </>
   );
 };
@@ -88,4 +167,43 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
   },
+  inputContainer: {
+    marginVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  input: {
+    padding: 20,
+    borderColor: "#E0E0E0",
+    borderWidth: 1,
+    borderRadius: 5,
+    flex: 1,
+  },
+  catContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginVertical: 10,
+  },
+  cat: {
+    borderColor: "#E0E0E0",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderWidth: 2,
+    borderRadius: 25,
+  },
+  suggestionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    flexWrap: "wrap",
+    marginVertical: 10,
+  },
+  suggestion:{
+    backgroundColor: "#F0F8FF",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 25,
+  }
 });

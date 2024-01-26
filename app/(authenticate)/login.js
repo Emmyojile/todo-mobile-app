@@ -37,7 +37,7 @@ const login = () => {
       password: password,
     };
 
-    axios.post("http://localhost:5000/login", user).then((response) => {
+    axios.post("http://10.0.2.2:5000/login", user).then((response) => {
       const token = response.data.token;
       AsyncStorage.setItem("authToken", token);
       router.replace("/(tabs)/home");

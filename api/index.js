@@ -7,9 +7,9 @@ const app = express();
 const port = 5000;
 const cors = require("cors");
 const corsOptions = {
-  origin: ["*", "http://10.0.2.2:3000"], 
-  methods: "GET, POST, PUT, DELETE", 
-  allowedHeaders: "Content-Type, Authorization", 
+  origin: ["*", "http://10.0.2.2:3000"],
+  methods: "GET, POST, PUT, DELETE",
+  allowedHeaders: "Content-Type, Authorization",
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -27,7 +27,7 @@ mongoose
     console.log("Connected to MongoDb");
   })
   .catch((error) => {
-    console.log("Error connecting to MongoDB");
+    console.log(error, "Error connecting to MongoDB");
   });
 
 app.listen(port, () => {
@@ -85,7 +85,7 @@ app.post("/login", async (req, res) => {
 
     const token = jwt.sign({ userId: user._id }, secretKey);
 
-    res.status(200).json(token);
+    res.status(200).json({ token });
   } catch (error) {
     console.log("Error: " + error);
     res.status(500).json({ message: "Internal server error" });

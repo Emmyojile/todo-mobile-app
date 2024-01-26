@@ -27,7 +27,7 @@ const handleRegister = () => {
         password:password
     }
 
-    axios.post("http://localhost:5000/register",user).then((response) => {
+    axios.post("http://10.0.2.2:5000/register",user).then((response) => {
         console.log(response);
         Alert.alert("Registration successfull","You have been registered succesfully");
         setEmail("");
