@@ -15,11 +15,35 @@ import {
   ModalTitle,
   SlideAnimation,
 } from "react-native-modals";
+import axios from "axios";
 
 const index = () => {
   const todos = [];
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [category, setCategory] = useState("All");
   const [todo, setTodo] = useState("");
+
+  const addTodo = async () => {
+    try {
+      const todoData = {
+        title: todo,
+        category: category,
+      };
+
+      axios
+        .post("http://10.0.2.2:5000/todos/65b39eebf52469c6800f0448", todoData)
+        .then((response) => {
+          console.log("response", response);
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
+        setIsModalVisible(false);
+        setTodo("");
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
 
   const suggestions = [
     { id: 0, todo: "Buy groceries" },
@@ -90,7 +114,7 @@ const index = () => {
       <BottomModal
         onBackDropPress={() => setIsModalVisible(!isModalVisible)}
         onHardwareBackPress={() => setIsModalVisible(!isModalVisible)}
-        swipeDirection={["down", "up"]}
+        swipeDirection={["up", "down"]}
         swipeThreshold={200}
         modalTitle={<ModalTitle title="Add a Todo" />}
         modalAnimation={
@@ -101,7 +125,7 @@ const index = () => {
         visible={isModalVisible}
         onTouchOutside={() => setIsModalVisible(!isModalVisible)}
       >
-        <ModalContent style={{ width: "100%", height: 200 }}>
+        <ModalContent style={{ width: "100%", height: 300 }}>
           <View style={styles.inputContainer}>
             <TextInput
               value={todo}
@@ -109,19 +133,25 @@ const index = () => {
               placeholder="Input a new todo"
               style={styles.input}
             />
-            <Ionicons name="send" size={24} color="#007FFF" />
+            <Ionicons onPress={addTodo} name="send" size={24} color="#007FFF" />
           </View>
 
           <Text>Choose a category</Text>
 
           <View style={styles.catContainer}>
-            <Pressable style={styles.cat}>
+            <Pressable style={styles.cat} onPress={() => setCategory("Work")}>
               <Text>Work</Text>
             </Pressable>
-            <Pressable style={styles.cat}>
+            <Pressable
+              style={styles.cat}
+              onPress={() => setCategory("Personal")}
+            >
               <Text>Personal</Text>
             </Pressable>
-            <Pressable style={styles.cat}>
+            <Pressable
+              style={styles.cat}
+              onPress={() => setCategory("Wishlist")}
+            >
               <Text>WishList</Text>
             </Pressable>
           </View>
@@ -129,8 +159,12 @@ const index = () => {
           <Text>Some Suggestions</Text>
           <View style={styles.suggestionContainer}>
             {suggestions?.map((item, index) => (
-              <Pressable key={item.id} style={styles.suggestion}>
-                <Text style={{textAlign:"center"}}>{item.todo}</Text>
+              <Pressable
+                onPress={() => setTodo(item?.todo)}
+                key={item.id}
+                style={styles.suggestion}
+              >
+                <Text style={{ textAlign: "center" }}>{item.todo}</Text>
               </Pressable>
             ))}
           </View>
@@ -200,10 +234,10 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     marginVertical: 10,
   },
-  suggestion:{
+  suggestion: {
     backgroundColor: "#F0F8FF",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 25,
-  }
+  },
 });

@@ -18,6 +18,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const jwt = require("jsonwebtoken");
+const moment = require("moment");
 
 mongoose
   .connect(
@@ -91,3 +92,32 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+
+app.post("/todos/:userId",async (req,res) => {
+  try {
+    const userId  = req.params.userId;
+    const {title,category} = req.body;
+
+    const newTodo = new Todo({
+      title,
+      category,
+      dueDate:moment().format("YYYY-MM-DD")
+    })
+
+    await newTodo.save();
+
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(400).json({ message: "User not found" });
+    }
+
+    user?.todos.push(newTodo._id);
+    await user.save();
+    
+    res.status(201).json({message:"Todo added Successfully" ,todo: newTodo });
+  } catch (error) {
+    console.log("Error: " + error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+})
