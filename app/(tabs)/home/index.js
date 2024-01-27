@@ -7,7 +7,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import {
   BottomModal,
@@ -18,11 +18,12 @@ import {
 import axios from "axios";
 
 const index = () => {
-  const todos = [];
+  const [todos, setTodos] = useState([])
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [category, setCategory] = useState("All");
   const [todo, setTodo] = useState("");
-
+  const [pendingTodo, setPendingTodo] = useState([]);
+  const [completedTodo, setCompletedTodo] = useState([]);
   const addTodo = async () => {
     try {
       const todoData = {
@@ -54,7 +55,29 @@ const index = () => {
     { id: 5, todo: "Attend a meeting" },
     { id: 6, todo: "Go For Training" },
   ];
+useEffect(() => {
+getUserTodos()
+},[]);
 
+  const getUserTodos = async () => {
+    try {
+      const response = await axios.get(
+        "http://10.0.2.2:5000/users/65b39eebf52469c6800f0448/todos"
+      );
+      console.log(response.data.todos);
+      setTodos(response.data.todos);
+
+      const fetchedTodos = response.data.todos || [];
+      const pendingTodos = fetchedTodos.filter((todo) => todo.status !== "completed");
+      const completedTodos = fetchedTodos.filter((todo) => todo.status === "completed");
+      setPendingTodo(pendingTodos);
+      setCompletedTodo(completedTodos);
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+  console.log("completed", completedTodo);
+  console.log("pending", pendingTodo);
   return (
     <>
       <View style={styles.topContainer}>

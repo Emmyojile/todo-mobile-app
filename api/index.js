@@ -127,12 +127,12 @@ app.get("/users/:userId/todos", async (req, res) => {
 
     const user = await User.findById(userId).populate("todos");
     if (!user) {
-      res.status(400).json({ error: "User not found" });
+      return res.status(400).json({ error: "User not found" });
     }
 
     res.status(200).json({ todos: user.todos });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+     res.status(500).json({ message: "Internal server error" });
   }
 });
 
