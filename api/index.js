@@ -93,17 +93,16 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
-app.post("/todos/:userId",async (req,res) => {
+app.post("/todos/:userId", async (req, res) => {
   try {
-    const userId  = req.params.userId;
-    const {title,category} = req.body;
+    const userId = req.params.userId;
+    const { title, category } = req.body;
 
     const newTodo = new Todo({
       title,
       category,
-      dueDate:moment().format("YYYY-MM-DD")
-    })
+      dueDate: moment().format("YYYY-MM-DD"),
+    });
 
     await newTodo.save();
 
@@ -114,10 +113,49 @@ app.post("/todos/:userId",async (req,res) => {
 
     user?.todos.push(newTodo._id);
     await user.save();
-    
-    res.status(201).json({message:"Todo added Successfully" ,todo: newTodo });
+
+    res.status(201).json({ message: "Todo added Successfully", todo: newTodo });
   } catch (error) {
     console.log("Error: " + error);
     res.status(500).json({ message: "Internal server error" });
   }
-})
+});
+
+app.get("/users/:userId/todos", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const user = await User.findById(userId).populate("todos");
+    if (!user) {
+      res.status(400).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ todos: user.todos });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.patch("/todos/:todoId/complete", async (req, res) => {
+  try {
+    const todoId = req.params.todoId;
+
+    const updatedTodo = await Todo.findByIdAndUpdate(
+      todoId,
+      {
+        status: "completed",
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!updatedTodo) {
+      res.status(400).json({ error: "Todo not found" });
+    }
+
+    res.status(200).json({message:"Todo Marked As Complete", todo: updatedTodo });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
