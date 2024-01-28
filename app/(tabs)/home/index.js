@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import {
   BottomModal,
@@ -44,6 +44,7 @@ const index = () => {
         .catch((error) => {
           console.log("error", error);
         });
+      await getUserTodos();
       setIsModalVisible(false);
       setTodo("");
     } catch (error) {
@@ -62,7 +63,7 @@ const index = () => {
   ];
   useEffect(() => {
     getUserTodos();
-  }, []);
+  }, [marked, isModalVisible]);
 
   const getUserTodos = async () => {
     try {
@@ -85,7 +86,7 @@ const index = () => {
       console.log("error", error);
     }
   };
-  const markTodoCompleted = async (todoId) => {
+  const markTodoAsCompleted = async (todoId) => {
     try {
       setMarked(true);
       const response = await axios.patch(
@@ -142,7 +143,12 @@ const index = () => {
                       gap: 10,
                     }}
                   >
-                    <Entypo name="circle" size={18} color="black" />
+                    <Entypo
+                      onPress={() => markTodoAsCompleted(item?._id)}
+                      name="circle"
+                      size={18}
+                      color="black"
+                    />
                     <Text style={{ flex: 1 }}>{item?.title}</Text>
                     <Feather name="flag" size={20} color="black" />
                   </View>
@@ -198,7 +204,7 @@ const index = () => {
                           gap: 10,
                         }}
                       >
-                        <Entypo name="circle" size={18} color="black" />
+                        <FontAwesome name="circle" size={18} color="gray" />
                         <Text
                           style={{
                             flex: 1,
