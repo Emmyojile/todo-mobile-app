@@ -8,7 +8,9 @@ import {
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import {
   BottomModal,
   ModalContent,
@@ -16,14 +18,17 @@ import {
   SlideAnimation,
 } from "react-native-modals";
 import axios from "axios";
+import moment from "moment";
 
 const index = () => {
-  const [todos, setTodos] = useState([])
+  const [todos, setTodos] = useState([]);
+  const today = moment().format("MMM Do");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [category, setCategory] = useState("All");
   const [todo, setTodo] = useState("");
   const [pendingTodo, setPendingTodo] = useState([]);
   const [completedTodo, setCompletedTodo] = useState([]);
+  const [marked, setMarked] = useState(false);
   const addTodo = async () => {
     try {
       const todoData = {
@@ -39,8 +44,8 @@ const index = () => {
         .catch((error) => {
           console.log("error", error);
         });
-        setIsModalVisible(false);
-        setTodo("");
+      setIsModalVisible(false);
+      setTodo("");
     } catch (error) {
       console.log("error", error);
     }
@@ -55,9 +60,9 @@ const index = () => {
     { id: 5, todo: "Attend a meeting" },
     { id: 6, todo: "Go For Training" },
   ];
-useEffect(() => {
-getUserTodos()
-},[]);
+  useEffect(() => {
+    getUserTodos();
+  }, []);
 
   const getUserTodos = async () => {
     try {
@@ -68,14 +73,29 @@ getUserTodos()
       setTodos(response.data.todos);
 
       const fetchedTodos = response.data.todos || [];
-      const pendingTodos = fetchedTodos.filter((todo) => todo.status !== "completed");
-      const completedTodos = fetchedTodos.filter((todo) => todo.status === "completed");
+      const pendingTodos = fetchedTodos.filter(
+        (todo) => todo.status !== "completed"
+      );
+      const completedTodos = fetchedTodos.filter(
+        (todo) => todo.status === "completed"
+      );
       setPendingTodo(pendingTodos);
       setCompletedTodo(completedTodos);
     } catch (error) {
       console.log("error", error);
     }
-  }
+  };
+  const markTodoCompleted = async (todoId) => {
+    try {
+      setMarked(true);
+      const response = await axios.patch(
+        `http://10.0.2.2:5000/todos/${todoId}/complete`
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
   console.log("completed", completedTodo);
   console.log("pending", pendingTodo);
   return (
@@ -103,7 +123,98 @@ getUserTodos()
       <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
         <View style={{ padding: 10 }}>
           {todos?.length > 0 ? (
-            <View></View>
+            <View>
+              {pendingTodo?.length > 0 && <Text>Tasks to Do! {today}</Text>}
+
+              {pendingTodo?.map((item, index) => (
+                <Pressable
+                  style={{
+                    backgroundColor: "#e0e0e0",
+                    padding: 10,
+                    borderRadius: 7,
+                    marginVertical: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 10,
+                    }}
+                  >
+                    <Entypo name="circle" size={18} color="black" />
+                    <Text style={{ flex: 1 }}>{item?.title}</Text>
+                    <Feather name="flag" size={20} color="black" />
+                  </View>
+                </Pressable>
+              ))}
+
+              {completedTodo?.length > 0 && (
+                <View>
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                      margin: 10,
+                    }}
+                  >
+                    <Image
+                      style={{ width: 100, height: 100 }}
+                      source={{
+                        uri: "https://cdn-icons-png.flaticon.com/128/6784/6784655.png",
+                      }}
+                    />
+                  </View>
+
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 5,
+                      marginVertical: 10,
+                    }}
+                  >
+                    <Text>Completed Tasks</Text>
+                    <MaterialIcons
+                      name="arrow-drop-down"
+                      size={24}
+                      color="black"
+                    />
+                  </View>
+
+                  {completedTodo?.map((item, index) => (
+                    <Pressable
+                      style={{
+                        backgroundColor: "#e0e0e0",
+                        padding: 10,
+                        borderRadius: 7,
+                        marginVertical: 10,
+                      }}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          gap: 10,
+                        }}
+                      >
+                        <Entypo name="circle" size={18} color="black" />
+                        <Text
+                          style={{
+                            flex: 1,
+                            textDecorationLine: "line-through",
+                            color: "gray",
+                          }}
+                        >
+                          {item?.title}
+                        </Text>
+                        <Feather name="flag" size={20} color="gray" />
+                      </View>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
+            </View>
           ) : (
             <View style={styles.addTab}>
               <Image
