@@ -132,7 +132,7 @@ app.get("/users/:userId/todos", async (req, res) => {
 
     res.status(200).json({ todos: user.todos });
   } catch (error) {
-     res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -154,7 +154,43 @@ app.patch("/todos/:todoId/complete", async (req, res) => {
       res.status(400).json({ error: "Todo not found" });
     }
 
-    res.status(200).json({message:"Todo Marked As Complete", todo: updatedTodo });
+    res
+      .status(200)
+      .json({ message: "Todo Marked As Complete", todo: updatedTodo });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/todos/completed/:date", async (req, res) => {
+  try {
+    const date = req.params.date;
+
+    const completedTodos = await Todo.find({
+      status: "completed",
+      createdAt: {
+        $gte: new Date(`${date}T00:00:00.000Z`),
+        $lt: new Date(`${date}T23:59:59.999Z`),
+      },
+    }).exec();
+
+    res.status(200).json({ completedTodos });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/todos/count", async (req, res) => {
+  try {
+    const totalCompletedTodos = await Todo.countDocuments({
+      status: "completed",
+    }).exec();
+
+    const totalPendingTodos = await Todo.countDocuments({
+      status: "pending",
+    }).exec();
+
+    res.status(200).json({ totalCompletedTodos, totalPendingTodos });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
