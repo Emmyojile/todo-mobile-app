@@ -2,8 +2,12 @@ import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { LineChart } from "react-native-chart-kit";
+import { AntDesign } from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
 const index = () => {
+  const router = useRouter();
   const [completedTasks, setCompletedTasks] = useState(0);
   const [pendingTasks, setPendingTasks] = useState(0);
 
@@ -19,6 +23,17 @@ const index = () => {
     }
   };
 
+  const logOut = async () => {
+    try {
+      await AsyncStorage.removeItem('@authToken')
+      router.replace("/login");
+    } catch(e) {
+      // remove error
+    }
+  
+    console.log('Done.')
+  }
+
   useEffect(() => {
     fetchTasksData();
   }, []);
@@ -33,14 +48,18 @@ const index = () => {
             uri: "https://lh3.googleusercontent.com/ogw/ANLem4Zmk7fohWyH7kB6YArqFy0WMfXnFtuX3PX3LSBf=s64-c-mo",
           }}
         />
-        <View>
+        <View style={{flex:1}}>
           <Text style={{ fontSize: 16, fontWeight: "600" }}>
-            Kepp Plans for 15 Days
+            Keep Plans for 15 Days
           </Text>
           <Text style={{ fontSize: 15, color: "gray", marginTop: 4 }}>
             Select Categories
           </Text>
         </View>
+
+        <AntDesign
+        onPress={logOut}
+        name="logout" size={24} color="black" style={{marginRight:10}}/>
       </View>
 
       <View style={{ marginVertical: 12 }}>

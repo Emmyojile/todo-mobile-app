@@ -67,6 +67,14 @@ const index = () => {
     getUserTodos();
   }, [marked, isModalVisible]);
 
+  const filteredTodos = todos.filter((todo) => {
+    if (category === "All") {
+      return true;
+    } else {
+      return todo.category === category;
+    }
+  });
+
   const getUserTodos = async () => {
     try {
       const response = await axios.get(
@@ -104,13 +112,13 @@ const index = () => {
   return (
     <>
       <View style={styles.topContainer}>
-        <Pressable style={styles.tabs}>
+        <Pressable style={styles.tabs} onPress={() => setCategory("All")}>
           <Text style={{ color: "white", textAlign: "center" }}>All</Text>
         </Pressable>
-        <Pressable style={styles.tabs}>
+        <Pressable style={styles.tabs} onPress={() => setCategory("Work")}>
           <Text style={{ color: "white", textAlign: "center" }}>Work</Text>
         </Pressable>
-        <Pressable style={styles.tabs}>
+        <Pressable style={styles.tabs} onPress={() => setCategory("Personal")}>
           <Text style={{ color: "white", textAlign: "center" }}>Personal</Text>
         </Pressable>
         <Pressable style={{ marginLeft: "auto" }}>
@@ -125,24 +133,24 @@ const index = () => {
 
       <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
         <View style={{ padding: 10 }}>
-          {todos?.length > 0 ? (
+          {filteredTodos?.length > 0 ? (
             <View>
-              {pendingTodo?.length > 0 && <Text>Tasks to Do! {today}</Text>}
+              {filteredTodos?.length > 0 && <Text>Tasks to Do! {today}</Text>}
 
-              {pendingTodo?.map((item, index) => (
+              {filteredTodos?.map((item, index) => (
                 <Pressable
-                onPress={() => {
-                  router?.push({
-                    pathname: '/home/info',
-                    params: {
-                      id: item._id,
-                      title: item?.title,
-                      category: item?.category,
-                      createdAt: item?.createdAt,
-                      dueDate: item?.dueDate,
-                    }
-                  })
-                }}
+                  onPress={() => {
+                    router?.push({
+                      pathname: "/home/info",
+                      params: {
+                        id: item._id,
+                        title: item?.title,
+                        category: item?.category,
+                        createdAt: item?.createdAt,
+                        dueDate: item?.dueDate,
+                      },
+                    });
+                  }}
                   style={{
                     backgroundColor: "#e0e0e0",
                     padding: 10,
