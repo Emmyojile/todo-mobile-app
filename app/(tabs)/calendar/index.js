@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
 import { Calendar } from "react-native-calendars";
+import { Feather, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
 
 const index = () => {
@@ -24,11 +25,65 @@ const index = () => {
 
   useEffect(() => {
     fetchCompletedTodos();
-  }, []);
+  }, [selectedDate]);
   console.log("Calendar", todos);
+  const handleDayPress = (day) => {
+    setSelectedDate(day.dateString);
+  };
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
-      <Calendar onDayPress={(day) => setSelectedDate(day.dateString)} />
+      <Calendar
+        onDayPress={handleDayPress}
+        markedDates={{
+          [selectedDate]: { selected: true, selectedColor: "#7cb9e8" },
+        }}
+      />
+
+      <View style={{ marginTop: 20 }} />
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 5,
+          marginVertical: 10,
+          marginHorizontal: 10,
+        }}
+      >
+        <Text>Completed Tasks</Text>
+        <MaterialIcons name="arrow-drop-down" size={24} color="black" />
+      </View>
+      {todos?.map((item, index) => (
+        <Pressable
+          style={{
+            backgroundColor: "#e0e0e0",
+            padding: 10,
+            borderRadius: 7,
+            marginVertical: 10,
+            marginHorizontal: 10,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            <FontAwesome name="circle" size={18} color="gray" />
+            <Text
+              style={{
+                flex: 1,
+                textDecorationLine: "line-through",
+                color: "gray",
+              }}
+            >
+              {item?.title}
+            </Text>
+            <Feather name="flag" size={20} color="gray" />
+          </View>
+        </Pressable>
+      ))}
     </View>
   );
 };
